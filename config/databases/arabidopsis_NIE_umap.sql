@@ -45,7 +45,7 @@ CREATE TABLE `umap_coords` (
 
 LOCK TABLES `umap_coords` WRITE;
 /*!40000 ALTER TABLE `umap_coords` DISABLE KEYS */;
-INSERT INTO `umap_coords` VALUES (0,-3.696337,-0.631605,'Vascular');
+INSERT INTO `umap_coords` VALUES (43,-6.89231,7.56863,'Metabolic stress state'),(44,2.87577,-4.82349,'Dividing'),(45,-0.262505,-8.55344,'Guard'),(46,-4.5876,6.05261,'Defense state');
 /*!40000 ALTER TABLE `umap_coords` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -69,7 +69,7 @@ CREATE TABLE `umap_expression` (
 
 LOCK TABLES `umap_expression` WRITE;
 /*!40000 ALTER TABLE `umap_expression` DISABLE KEYS */;
-INSERT INTO `umap_expression` VALUES ('AT3G55980','{}');
+INSERT INTO `umap_expression` VALUES ('AT1G01010','{\"43\": 1.152292, \"44\": 1.546603, \"46\": 1.392931}'),('AT3G18780','{\"43\": 1.673516, \"44\": 3.142986, \"45\": 1.490115, \"46\": 1.953491}');
 /*!40000 ALTER TABLE `umap_expression` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
