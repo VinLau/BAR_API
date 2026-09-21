@@ -81,6 +81,7 @@ def create_app():
     from api.resources.gaia import gaia
     from api.resources.rnaseq_gene_expression import rnaseq_gene_expression
     from api.resources.microarray_gene_expression import microarray_gene_expression
+    from api.resources.umap_gene_expression import umap_gene_expression
     from api.resources.proxy import bar_proxy
     from api.resources.thalemine import thalemine
     from api.resources.snps import snps
@@ -98,6 +99,7 @@ def create_app():
     bar_api.add_namespace(gaia)
     bar_api.add_namespace(rnaseq_gene_expression)
     bar_api.add_namespace(microarray_gene_expression)
+    bar_api.add_namespace(umap_gene_expression)
     bar_api.add_namespace(bar_proxy)
     bar_api.add_namespace(thalemine)
     bar_api.add_namespace(snps)
