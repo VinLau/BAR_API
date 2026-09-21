@@ -81,6 +81,23 @@ class TestSignalStdColumn(TestCase):
         self.assertAlmostEqual(float(rows["D0_Mesophyll"]["value"]), 0.0346533, places=5)
         self.assertAlmostEqual(float(rows["D0_Mesophyll"]["value_std"]), 0.224356, places=5)
 
+    def test_mean_ctrl_is_returned_inline_as_an_ordinary_row(self):
+        """Mean_CTRL is the eFP view XML's <control> denominator, but it is stored like any
+        other data_bot_id. Rendering that distinction belongs to the view layer, so the
+        endpoint must not partition it out into a separate response key."""
+        response = self.client.get("/gene_expression/expression/arabidopsis_NIE_pseudobulk/AT1G01010")
+        self.assertEqual(response.status_code, 200)
+        payload = response.json["data"]
+        self.assertEqual(set(payload), {"gene_id", "probset_id", "database", "record_count", "data"})
+
+        names = [row["name"] for row in payload["data"]]
+        self.assertIn("Mean_CTRL", names)
+        self.assertEqual(names.count("Mean_CTRL"), 1)
+        self.assertEqual(payload["record_count"], len(payload["data"]))
+
+        mean_row = next(row for row in payload["data"] if row["name"] == "Mean_CTRL")
+        self.assertEqual(set(mean_row), {"name", "value", "value_std"})
+
     def test_other_databases_keep_the_two_key_row_shape(self):
         """Guards the additive-only promise: no new key may appear for the other databases."""
         response = self.client.get("/gene_expression/expression/klepikova/AT1G01010")
