@@ -54,19 +54,31 @@ class GeneExpression(Resource):
 
             query_id = rows[0][0]
 
+        # only databases whose schema_variant declares a standard deviation column have
+        # data_signal_std mapped; every other database keeps the two-key row shape
+        has_signal_std = hasattr(model, "data_signal_std")
+        columns = [model.data_bot_id, model.data_signal]
+        if has_signal_std:
+            columns.append(model.data_signal_std)
+
         rows = db.session.execute(
-            db.select(model.data_bot_id, model.data_signal).where(func.upper(model.data_probeset_id) == query_id.upper())
+            db.select(*columns).where(func.upper(model.data_probeset_id) == query_id.upper())
         ).all()
 
         if len(rows) == 0:
             return BARUtils.error_exit("There are no data found for the given gene"), 400
+
+        if has_signal_std:
+            data = [{"name": name, "value": str(value), "value_std": str(std)} for name, value, std in rows]
+        else:
+            data = [{"name": name, "value": str(value)} for name, value in rows]
 
         res = {
             "gene_id": gene_id,
             "probset_id": query_id,
             "database": database,
             "record_count": len(rows),
-            "data": [{"name": name, "value": str(value)} for name, value in rows],
+            "data": data,
         }
 
         return BARUtils.success_exit(res)

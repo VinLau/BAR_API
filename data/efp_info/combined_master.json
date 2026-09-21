@@ -706,6 +706,31 @@
           }
         }
       }
+    },
+    "pseudobulk_std": {
+      "assigned_databases": 1,
+      "tables": {
+        "sample_data": {
+          "columns": {
+            "data_bot_id": {
+              "type": "varchar",
+              "role": "sample"
+            },
+            "data_probeset_id": {
+              "type": "varchar",
+              "role": "gene_id"
+            },
+            "data_signal": {
+              "type": "float",
+              "role": "value"
+            },
+            "data_signal_std": {
+              "type": "float",
+              "role": "value_std"
+            }
+          }
+        }
+      }
     }
   },
   "gene_id_patterns": {
@@ -1387,6 +1412,27 @@
           }
         }
       },
+      "tables_present": [
+        "sample_data"
+      ],
+      "schema_source": "prod_information_schema",
+      "status": "active"
+    },
+    "arabidopsis_NIE_pseudobulk": {
+      "species": "arabidopsis",
+      "source": "super_viewer",
+      "platform": "rna_seq",
+      "schema_variant": "pseudobulk_std",
+      "schema_verified": true,
+      "value_semantics": {
+        "quantity": null,
+        "unit": null,
+        "scale": null
+      },
+      "identifier_type": "gene_model",
+      "gene_id_pattern": "arabidopsis",
+      "used_by": [],
+      "views": {},
       "tables_present": [
         "sample_data"
       ],

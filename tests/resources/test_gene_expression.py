@@ -6,6 +6,7 @@ from unittest import TestCase
 
 from api import app, db
 from api.models.annotations_lookup import AtAgiLookup
+from api.models.efp_dynamic import SAMPLE_DATA_MODELS
 
 
 class TestGeneExpression(TestCase):
@@ -50,6 +51,62 @@ class TestGeneExpression(TestCase):
         response = self.client.get("/gene_expression/expression/arabidopsis_ecotypes/261585_at")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["data"]["probset_id"], "261585_AT")
+
+
+class TestSignalStdColumn(TestCase):
+    """data_signal_std is exposed only for databases whose schema_variant declares it."""
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_only_the_pseudobulk_model_maps_data_signal_std(self):
+        """The variant-aware model generator has to stay a no-op for every other database."""
+        with_std = {name for name, model in SAMPLE_DATA_MODELS.items() if hasattr(model, "data_signal_std")}
+        self.assertEqual(with_std, {"arabidopsis_NIE_pseudobulk"})
+
+    def test_pseudobulk_rows_carry_value_std(self):
+        response = self.client.get("/gene_expression/expression/arabidopsis_NIE_pseudobulk/AT1G01010")
+        self.assertEqual(response.status_code, 200)
+        rows = response.json["data"]["data"]
+        self.assertTrue(rows)
+        for row in rows:
+            self.assertEqual(set(row), {"name", "value", "value_std"})
+
+    def test_pseudobulk_value_std_is_the_stored_column(self):
+        """value_std must be data_signal_std, not a second copy of data_signal."""
+        response = self.client.get("/gene_expression/expression/arabidopsis_NIE_pseudobulk/AT1G01010")
+        self.assertEqual(response.status_code, 200)
+        rows = {row["name"]: row for row in response.json["data"]["data"]}
+        self.assertIn("D0_Mesophyll", rows)
+        self.assertAlmostEqual(float(rows["D0_Mesophyll"]["value"]), 0.0346533, places=5)
+        self.assertAlmostEqual(float(rows["D0_Mesophyll"]["value_std"]), 0.224356, places=5)
+
+    def test_mean_ctrl_is_returned_inline_as_an_ordinary_row(self):
+        """Mean_CTRL is the eFP view XML's <control> denominator, but it is stored like any
+        other data_bot_id. Rendering that distinction belongs to the view layer, so the
+        endpoint must not partition it out into a separate response key."""
+        response = self.client.get("/gene_expression/expression/arabidopsis_NIE_pseudobulk/AT1G01010")
+        self.assertEqual(response.status_code, 200)
+        payload = response.json["data"]
+        self.assertEqual(set(payload), {"gene_id", "probset_id", "database", "record_count", "data"})
+
+        names = [row["name"] for row in payload["data"]]
+        self.assertIn("Mean_CTRL", names)
+        self.assertEqual(names.count("Mean_CTRL"), 1)
+        self.assertEqual(payload["record_count"], len(payload["data"]))
+
+        mean_row = next(row for row in payload["data"] if row["name"] == "Mean_CTRL")
+        self.assertEqual(set(mean_row), {"name", "value", "value_std"})
+
+    def test_other_databases_keep_the_two_key_row_shape(self):
+        """Guards the additive-only promise: no new key may appear for the other databases."""
+        response = self.client.get("/gene_expression/expression/klepikova/AT1G01010")
+        self.assertEqual(response.status_code, 200)
+        payload = response.json["data"]
+        self.assertEqual(set(payload), {"gene_id", "probset_id", "database", "record_count", "data"})
+        self.assertTrue(payload["data"])
+        for row in payload["data"]:
+            self.assertEqual(set(row), {"name", "value"})
 
 
 class TestAgiToProbesetConversion(TestCase):
