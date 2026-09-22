@@ -7,6 +7,19 @@ from api import db
 # catalog entry, so the species that selects the gene id pattern is declared here.
 UMAP_DATABASES = {
     "arabidopsis_NIE_umap": "arabidopsis",
+    "arabidopsis_flower_lee_umap": "arabidopsis",
+    "arabidopsis_root_shahan_umap": "arabidopsis",
+    "arabidopsis_rosette_21d_lee_umap": "arabidopsis",
+    "arabidopsis_rosette_30d_lee_umap": "arabidopsis",
+    "arabidopsis_seed_0d_lee_umap": "arabidopsis",
+    "arabidopsis_seed_martin_umap": "arabidopsis",
+    "arabidopsis_seedling_12d_lee_umap": "arabidopsis",
+    "arabidopsis_seedling_3d_lee_umap": "arabidopsis",
+    "arabidopsis_seedling_6d_lee_umap": "arabidopsis",
+    "arabidopsis_shoot_zhang_umap": "arabidopsis",
+    "arabidopsis_silique_lee_umap": "arabidopsis",
+    "arabidopsis_stem_lee_umap": "arabidopsis",
+    "rice_OW_umap": "rice",
 }
 
 
